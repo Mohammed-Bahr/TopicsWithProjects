@@ -1,0 +1,7 @@
+﻿  Source.cpp
+  Word_Tic_Tac_Toe.cpp
+  Generating Code...
+Word_Tic_Tac_Toe.obj : error LNK2005: "void __cdecl loadDictionary(void)" (?loadDictionary@@YAXXZ) already defined in Source.obj
+Word_Tic_Tac_Toe.obj : error LNK2005: "class std::vector<class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >,class std::allocator<class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> > > > threecharwords" (?threecharwords@@3V?$vector@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V?$allocator@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@2@@std@@A) already defined in Source.obj
+Word_Tic_Tac_Toe.obj : error LNK2005: "class std::vector<class std::vector<char,class std::allocator<char> >,class std::allocator<class std::vector<char,class std::allocator<char> > > > board" (?board@@3V?$vector@V?$vector@DV?$allocator@D@std@@@std@@V?$allocator@V?$vector@DV?$allocator@D@std@@@std@@@2@@std@@A) already defined in Source.obj
+C:\Users\user\OneDrive\Desktop\S_P\mathmatical matrices\x64\Debug\mathmatical matrices.exe : fatal error LNK1169: one or more multiply defined symbols found
