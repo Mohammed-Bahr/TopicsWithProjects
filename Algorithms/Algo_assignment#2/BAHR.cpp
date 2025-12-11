@@ -1,87 +1,152 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-int optimizeLootSplit(int n, vector<int>& coins) {
-    // Calculate total sum
+int optimizeLootSplit(int n, vector<int> &coins)
+{
+
     int total = 0;
-    for (int coin : coins) {
-        total += coin;
-    }
-    
+    for (int c : coins)
+        total += c;
+
     int target = total / 2;
-    
-    // DP array: dp[i] = true if sum i is achievable
+
     vector<bool> dp(target + 1, false);
     dp[0] = true;
-    
-    // For each coin, update possible sums
-    for (int coin : coins) {
-        for (int j = target; j >= coin; j--) {
-            dp[j] = dp[j] || dp[j - coin];
+
+    for (int c : coins)
+    {
+        for (int s = target; s >= c; s--)
+        {
+            if (dp[s - c])
+                dp[s] = true;
         }
     }
-    
-    // Find the largest achievable sum <= target
-    int closest = 0;
-    for (int i = target; i >= 0; i--) {
-        if (dp[i]) {
-            closest = i;
+
+    int best = 0;
+    for (int s = target; s >= 0; s--)
+    {
+        if (dp[s])
+        {
+            best = s;
             break;
         }
     }
-    
-    // Minimum difference is |closest - (total - closest)|
-    return abs(2 * closest - total);
+
+    int other = total - best;
+    return abs(other - best);
 }
 
 
-int maximizeCarryValue(int capacity, vector<pair<int, int>>& items) {
-    int n = items.size();
-    
-    // dp[i][w] = max value using first i items with capacity w
-    vector<vector<int>> dp(n + 1, vector<int>(capacity + 1, 0));
-    
-    for (int i = 1; i <= n; i++) {
-        int weight = items[i - 1].first;
-        int value = items[i - 1].second;
-        
-        for (int w = 0; w <= capacity; w++) {
-            // Don't take item i
-            dp[i][w] = dp[i - 1][w];
-            
-            // Take item i if possible
-            if (w >= weight) {
-                dp[i][w] = max(dp[i][w], dp[i - 1][w - weight] + value);
+int maximizeCarryValue(int capacity, vector<pair<int, int>> &items)
+{
+    int R = items.size();  //total rows
+    int C = capacity;  //total columns
+    vector<vector<int>> dp(R + 1, vector<int>(C + 1, 0));
+
+    for (int r = 1; r <= R; r++)
+    {
+        int weight = items[r - 1].first;
+        int value = items[r - 1].second;
+
+        for (int c = 1; c <= C; c++)
+        {
+            dp[r][c] = dp[r - 1][c];
+
+            if (c >= weight)
+            {
+                dp[r][c] = max(dp[r][c], dp[r - 1][c - weight] + value);
             }
         }
     }
-    
-    return dp[n][capacity];
+
+    return dp[R][C];
 }
 
 
-long long countStringPossibilities(string s) {
-    int n = s.length();
-    if (n == 0) return 1;
-    
-    // dp[i] = number of ways to decode s[0...i-1]
-    vector<long long> dp(n + 1, 0);
-    dp[0] = 1; // Empty string has one way
-    dp[1] = 1; // Single character has one way
-    
-    for (int i = 2; i <= n; i++) {
-        // Always can decode as individual characters
-        dp[i] = dp[i - 1];
+long long countStringPossibilities(string s)
+{
+    const long long MOD = 1e9 + 7;
+    int n = s.size();
+
+    map<string, long long> dp;
+    dp[""] = 1LL;
+    dp["n"] = 1LL;
+    dp["u"] = 1LL;
+    dp["nn"] = 2LL;
+    dp["uu"] = 2LL;
+
+    //------------------------------------------
+
+    queue<char> q;
+    for (int i = 0 ; i < n; i++)
+    {
+        q.push(s[i]);
+    }
+
+    long long count = 1;   
+
+    while (!q.empty())
+    {
+        char ch1 = q.front();
+        q.pop();
+
+        if (q.empty())
+        {
+            string single = "";
+            single += ch1;
+
+            if (dp.find(single) != dp.end())
+                count *= dp[single];
+            else
+                count *= dp[""] ;
+
+            break;
+        }
+
+        //------------------------------------------
+        char ch2 = q.front();
         
-        // Check if we can decode last two characters as a pair
-        if (s[i - 2] == 'u' && s[i - 1] == 'u') {
-            // "uu" can be "w" or "uu", so add alternative decodings
-            dp[i] += dp[i - 2];
-        } else if (s[i - 2] == 'n' && s[i - 1] == 'n') {
-            // "nn" can be "m" or "nn", so add alternative decodings
-            dp[i] += dp[i - 2];
+        string comb = "";
+        comb += ch1;
+        comb += ch2;
+
+        if (dp.find(comb) != dp.end())
+        {
+            count *= dp[comb];
+            q.pop();
+        }
+        else
+        {
+            string single = "";
+            single += ch1;
+
+            if (dp.find(single) != dp.end())
+                count *= dp[single];
+            else
+                count *= dp[""] ;
         }
     }
-    
-    return dp[n];
+
+    return count % MOD;
+}
+
+
+int main()
+{
+    // Test optimizeLootSplit
+    vector<int> coins = {1, 2, 4};
+    cout << "optimizeLootSplit({1,2,4}) = " << optimizeLootSplit((int)coins.size(), coins) << '\n';
+
+    // Test maximizeCarryValue
+    vector<pair<int, int>> items = {{3, 4}, {4, 5}, {2, 3}};
+    cout << "maximizeCarryValue(cap=7) = " << maximizeCarryValue(7, items) << '\n';
+
+    // Test countStringPossibilities
+    vector<string> tests = {"n", "nn", "u", "uu", "uuu", "nnuu","mnuu"};
+    for (const auto &t : tests)
+    {
+        cout << "countStringPossibilities(\"" << t << "\") = " << countStringPossibilities(t) << '\n';
+    }
+
+    return 0;
 }
