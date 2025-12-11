@@ -10,6 +10,28 @@ using namespace std;
 
 deque<pair<int, int>> deq; // Deque to store the snake's body as pairs (x, y)
 
+void setCursorPosition(short x, short y) {
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    COORD position = { x, y };
+    SetConsoleCursorPosition(hOut, position);
+}
+
+void hideCursor() {
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_CURSOR_INFO cursorInfo;
+    GetConsoleCursorInfo(hOut, &cursorInfo);
+    cursorInfo.bVisible = FALSE;
+    SetConsoleCursorInfo(hOut, &cursorInfo);
+}
+
+void showCursor() {
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_CURSOR_INFO cursorInfo;
+    GetConsoleCursorInfo(hOut, &cursorInfo);
+    cursorInfo.bVisible = TRUE;
+    SetConsoleCursorInfo(hOut, &cursorInfo);
+}
+
 enum D { top = 1, down, left, right };
 
 class map {
@@ -44,12 +66,14 @@ void end();
 //-------------------------------------------------------
 void setup() {
     srand(time(NULL));
+    deq.clear();
     m.width = 40;
     m.height = 20;
     m.fruitx = rand() % (m.width - 2) + 1;
     m.fruity = rand() % (m.height - 2) + 1;
     s.headx = m.width / 2;
     s.heady = m.height / 2;
+    s.dir = D::right;
     p.score = 0;
     p.lose = false;
     deq.push_front({ s.headx, s.heady });
@@ -57,13 +81,13 @@ void setup() {
 
 //-------------------------------------------------------
 void game_board() {
-    system("cls");
+    setCursorPosition(0, 0);
 
     // Top border
-    /*for (int i = 0; i < m.width; i++) {
+    for (int i = 0; i < m.width; i++) {
         cout << "-";
     }
-    cout << endl;*/
+    cout << endl;
 
     // Game area
     for (int u = 0; u < m.height; u++) {
@@ -126,7 +150,7 @@ void input_game() {
         case 'x':
             exit(0);
         default:
-            cout << "Wrong input (-_-) ";
+            break;
         }
     }
 }
@@ -200,6 +224,8 @@ void levels() {
 //-------------------------------------------------------
 int main() {
     setup();
+    hideCursor();
+    setCursorPosition(0, 0);
     while (!p.lose) {
         game_board();
         input_game();
@@ -209,6 +235,8 @@ int main() {
         Sleep(lev);
     }
 
+    showCursor();
+    setCursorPosition(0, m.height + 3);
     cout << "\nGame Over! Your score is (>_<): " << p.score << endl;
     return 0;
 }
